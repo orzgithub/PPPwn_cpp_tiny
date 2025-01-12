@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 include(CMakeDependentOption)
 set(APP_BUILD_OPTIONS)
 set(APP_LINK_LIB)
+add_compile_options(-Os)
 
 # Zig makes cross-compiling easier and ignores glibc version issue
 # target can be: x86_64-macos-none, x86_64-macos.11.0-none, x86_64-windows-gnu, mipsel-linux-musl, x86_64-linux-gnu.2.17, ...

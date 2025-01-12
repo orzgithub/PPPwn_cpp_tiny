@@ -13,6 +13,7 @@ This is the C++ rewrite of [PPPwn](https://github.com/TheOfficialFloW/PPPwn)
 # The difference between this Fork and the original project
 
 - Removed the webui to reduce the binary size
+- Build with -Os option for a smaller size
 
 # Nightly build
 
@@ -88,6 +89,8 @@ cmake --build build -t pppwn
 cmake -B build -DZIG_TARGET=x86_64-windows-gnu -DUSE_SYSTEM_PCAP=OFF -DPacket_ROOT=<path to npcap sdk>
 cmake --build build -t pppwn
 ```
+
+After building you can use strip and upx to reduce the binary size.
 
 # Credits
 
