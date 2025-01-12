@@ -10,15 +10,13 @@ This is the C++ rewrite of [PPPwn](https://github.com/TheOfficialFloW/PPPwn)
 - Restart automatically when failing
 - Can be compiled as a library integrated into your application
 
+# The difference between this Fork and the original project
+
+- Removed the webui to reduce the binary size
+
 # Nightly build
 
-You can download the latest build from [nightly.link](https://nightly.link/xfangfang/PPPwn_cpp/workflows/ci.yaml/main?status=completed).
-
-For Windows users, you need to install [npcap](https://npcap.com) before run this program.
-There are lots of GUI wrapper for pppwn_cpp, it's better to use them if you are not familiar with command line.
-
-For macOS users, you need to run `sudo xattr -rd com.apple.quarantine <path-to-pppwn>` after download.
-Please refer to [#10](https://github.com/xfangfang/PPPwn_cpp/issues/10) for more information.
+This fork doesn't have a nightly build.
 
 # Usage
 
@@ -52,14 +50,12 @@ pppwn --interface en0 --fw 1100 --stage1 "stage1.bin" --stage2 "stage2.bin" --ti
 - `-nw` `--no-wait-padi`: don't wait one more [PADI](https://en.wikipedia.org/wiki/Point-to-Point_Protocol_over_Ethernet#Client_to_server:_Initiation_(PADI)) before starting the exploit
 - `-rs` `--real-sleep`: use CPU for more precise sleep time (Only used when execution speed is too slow)
 - `-old` `--old-ipv6`: use previous IPv6 address to exploit (Only used when the exploit fails)
-- `--web`: use the web interface
-- `--url`: the url of the web interface (default: `0.0.0.0:7796`)
 
 Supplement:
 
 1. For `--timeout`, waiting for `PADI` is not included, which allows you to start `pppwn_cpp` before the ps4 is launched.
 2. For `--no-wait-padi`, by default, `pppwn_cpp` will wait for two `PADI` request, according to [TheOfficialFloW/PPPwn/pull/48](https://github.com/TheOfficialFloW/PPPwn/pull/48) this helps to improve stability. You can turn off this feature with this parameter if you don't need it.
-3. For `--wait-after-pin`, according to [SiSTR0/PPPwn/pull/1](https://github.com/SiSTR0/PPPwn/pull/1) set this parameter to `20` helps to improve stability (not work for me), this option not used in web interface.
+3. For `--wait-after-pin`, according to [SiSTR0/PPPwn/pull/1](https://github.com/SiSTR0/PPPwn/pull/1) set this parameter to `20` helps to improve stability (not work for me).
 4. For `--groom-delay`, This is an empirical value. The Python version of pppwn does not set any wait at Heap grooming, but if the C++ version does not add some wait, there is a probability of kernel panic on my ps4. You can set any value within 1-4097 (4097 is equivalent to not doing any wait).
 5. For `--buffer-size`, When running on low-end devices, this value can be set to reduce memory usage. I tested that setting it to 10240 can run normally, and the memory usage is about 3MB. (Note: A value that is too small may cause some packets to not be captured properly)
 
@@ -79,6 +75,10 @@ cmake --build build -t pppwn
 cmake -B build -DZIG_TARGET=mipsel-linux-musl -DUSE_SYSTEM_PCAP=OFF -DZIG_COMPILE_OPTION="-msoft-float"
 cmake --build build -t pppwn
 
+# cross compile for mips linux (soft float)
+cmake -B build -DZIG_TARGET=mips-linux-musl -DUSE_SYSTEM_PCAP=OFF -DZIG_COMPILE_OPTION="-msoft-float"
+cmake --build build -t pppwn
+
 # cross compile for arm linux (armv7 cortex-a7)
 cmake -B build -DZIG_TARGET=arm-linux-musleabi -DUSE_SYSTEM_PCAP=OFF -DZIG_COMPILE_OPTION="-mcpu=cortex_a7"
 cmake --build build -t pppwn
@@ -92,5 +92,7 @@ cmake --build build -t pppwn
 # Credits
 
 Big thanks to FloW's magical work, you are my hero.
+
+Thanks to the original project. This repo only did a little work to make it work with my device.
 
 

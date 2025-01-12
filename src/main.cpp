@@ -6,6 +6,9 @@
 #include <PcapLiveDeviceList.h>
 #include <clipp.h>
 
+#include <sys/types.h>
+#include <signal.h>
+
 #if defined(__APPLE__)
 
 #include <SystemConfiguration/SystemConfiguration.h>
@@ -13,7 +16,6 @@
 #endif
 
 #include "exploit.h"
-#include "web.h"
 
 std::vector<uint8_t> readBinary(const std::string &filename) {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -103,11 +105,9 @@ enum FirmwareVersion getFirmwareOffset(int fw) {
 #define SUPPORTED_FIRMWARE "{700,701,702,750,751,755,800,801,803,850,852,900,903,904,950,951,960,1000,1001,1050,1070,1071,1100} (default: 1100)"
 
 static std::shared_ptr<Exploit> exploit = std::make_shared<Exploit>();
-static std::shared_ptr<WebPage> web = nullptr;
 
 static void signal_handler(int sig_num) {
     signal(sig_num, signal_handler);
-    if (web) web->stop();
     exploit->ppp_byebye();
     exit(sig_num);
 }
@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
     using namespace clipp;
     std::cout << "[+] PPPwn++ - PlayStation 4 PPPoE RCE by theflow" << std::endl;
     std::string interface, stage1 = "stage1/stage1.bin", stage2 = "stage2/stage2.bin";
-    std::string web_url = "0.0.0.0:7796";
     int fw = 1100;
     int timeout = 0;
     int wait_after_pin = 1;
@@ -124,7 +123,6 @@ int main(int argc, char *argv[]) {
     int buffer_size = 0;
     bool retry = false;
     bool no_wait_padi = false;
-    bool web_page = false;
     bool real_sleep = false;
     bool old_ipv6 = false;
 
@@ -145,9 +143,7 @@ int main(int argc, char *argv[]) {
             "don't wait one more PADI before starting" % option("-nw", "--no-wait-padi").set(no_wait_padi), \
             "Using the old ipv6 to exploit" % option("-old", "--old-ipv6").set(old_ipv6), \
             "Use CPU for more precise sleep time (Only used when execution speed is too slow)" %
-            option("-rs", "--real-sleep").set(real_sleep), \
-            "start a web page" % option("--web").set(web_page), \
-            "custom web page url (default: 0.0.0.0:7796)" % option("--url") & value("url", web_url)
+            option("-rs", "--real-sleep").set(real_sleep)
             ) | \
             "list interfaces" % command("list").call(listInterfaces)
     );
@@ -191,13 +187,6 @@ int main(int argc, char *argv[]) {
     exploit->setWaitAfterPin(wait_after_pin);
     exploit->setAutoRetry(retry);
     exploit->setRealSleep(real_sleep);
-
-    if (web_page) {
-        web = std::make_shared<WebPage>(exploit);
-        web->setUrl(web_url);
-        web->run();
-        return 0;
-    }
 
     return exploit->run();
 }

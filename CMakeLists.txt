@@ -131,11 +131,9 @@ if (BUILD_CLI)
             OUTPUT ${CMAKE_BINARY_DIR}/static.c
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${ZIG} cc ${CMAKE_C_FLAGS} -o ${CMAKE_BINARY_DIR}/pack ${mongoose_SOURCE_DIR}/test/pack.c
-            COMMAND ${CMAKE_BINARY_DIR}/pack web/index.html web/IBMPlexMono-Regular.ttf > ${CMAKE_BINARY_DIR}/static.c
-            DEPENDS web/index.html
     )
 
-    add_executable(${PROJECT_NAME} src/main.cpp src/web.cpp ${mongoose_SOURCE_DIR}/mongoose.c ${CMAKE_BINARY_DIR}/static.c)
+    add_executable(${PROJECT_NAME} src/main.cpp ${mongoose_SOURCE_DIR}/mongoose.c)
     target_include_directories(${PROJECT_NAME} PRIVATE ${clipp_SOURCE_DIR}/include ${mongoose_SOURCE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_static mongoose)
 endif ()
